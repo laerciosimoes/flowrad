@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "tomography"
+version = "0.1.0"
+description = "Tomography Service using FastAPI and Async MySQL"
+authors = ["laercio Simoes <laercio@hpcbrasil.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "src"}]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.13" 
+
+# Core Web Stack
+fastapi = "^0.115.5"
+uvicorn = {extras = ["standard"], version = "^0.32.1"}
+pydantic = {extras = ["email"], version = "^2.10.3"}
+
+# Database Stack (Async MySQL)
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
+asyncmy = "^0.2.10" # Async driver for MySQL (compatible with SQLAlchemy 2.0)
+alembic = "^1.14.0" # Database migrations
+
+# Utilities
+python-dotenv = "^1.0.1" # For environment configuration
+cryptography = "^46.0.3"
+langchain = "^1.0.4"
+langchain-openai = "^1.0.2"
+dotenv = "^0.9.9"
+langgraph = "^1.0.2"
+langchain-core = "^1.0.3"
+
+[tool.poetry.group.dev.dependencies]
+# Testing
+pytest = "^8.3.4"
+pytest-asyncio = "^0.24.0" # For testing async endpoints and repos
+httpx = "^0.28.1" # Async HTTP client for integration tests
+
+# Quality & Type Checking
+black = "^24.10.0" # Code formatter
+mypy = "^1.13.0"   # Static type checker
+isort = "^5.13.2" # Import sorter
+
+# Documentation/Linter (optional but highly recommended)
+flake8 = "^7.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# --- Tool Specific Configurations ---
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_only = true
+
+[tool.mypy]
+files = "src/"
+# Enforce strict typing, essential for DDD quality
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_return_any = true
+strict = true
+ignore_missing_imports = true # Temporarily ignore until you install all libraries

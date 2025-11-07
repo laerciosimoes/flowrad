@@ -1,0 +1,55 @@
+/target
+# -------------------------------------------------------------------
+# General Python Artifacts
+# -------------------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.ipynb_checkpoints
+
+# Virtual Environments
+# Traditional venv folder
+venv/
+.venv/
+# Poetry/Pipenv environments (often created outside the project root)
+.poetry
+.pdm-build/
+
+# Package installers
+*.egg-info/
+dist/
+build/
+
+# -------------------------------------------------------------------
+# IDE & OS Files
+# -------------------------------------------------------------------
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# -------------------------------------------------------------------
+# Project Specific Artifacts
+# -------------------------------------------------------------------
+# Environment variables (MUST NOT be committed)
+.env
+.env.local
+
+# Database files (if local development uses SQLite, etc.)
+*.db
+
+# Test coverage reports
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Alembic compiled files
+alembic/versions/

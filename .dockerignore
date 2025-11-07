@@ -1,0 +1,28 @@
+# -------------------------------------------------------------------
+# Python Build/Runtime Files
+# -------------------------------------------------------------------
+__pycache__/
+*.pyc
+venv/
+.venv/
+.git/
+.gitignore
+.dockerignore
+
+# -------------------------------------------------------------------
+# Development and Testing Artifacts
+# -------------------------------------------------------------------
+# We copy src/ separately, but these should be excluded just in case
+tests/
+alembic/versions/
+htmlcov/
+.coverage
+
+# IDE and OS Files
+.idea/
+.vscode/
+.DS_Store
+
+# Configuration files that shouldn't be baked into the image
+# Secrets should be handled by Docker Secrets or environment variables
+.env
