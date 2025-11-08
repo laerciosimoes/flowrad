@@ -38,7 +38,7 @@ const suggestProtocol = async (data: PatientData): Promise<string> => {
 };
 
 const suggestDiagnosis = async (data: PatientData): Promise<string> => {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-2.5-pro';
     // Fix: Remove redundant instructions from the text part as they are already in systemInstruction.
     const textPart = { text: `
         Patient Data:
