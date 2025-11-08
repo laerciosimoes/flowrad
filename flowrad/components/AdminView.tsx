@@ -85,9 +85,14 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBack }) => {
                             </div>
                         </div>
                         <div className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-500">
+                           <p><strong>Age:</strong> {wf.patientData.age} years</p>
+                           <p><strong>Sex:</strong> {wf.patientData.sex}</p>
+                           <p><strong>Weight:</strong> {wf.patientData.weight} kg</p>
+                           <p><strong>Indication:</strong> {wf.patientData.indication}</p>
+                           <p><strong>Creatinine:</strong> {wf.patientData.creatinine ? `${wf.patientData.creatinine} mg/dL` : 'Unknown'}</p>
+                           <p><strong>Allergies:</strong> {wf.patientData.allergies_str || 'None'}</p>
                            <p><strong>Reason for Exam:</strong> {wf.patientData.examDetails.reasonForExam}</p>
                            <p><strong>Body Part:</strong> {wf.patientData.examDetails.bodyPart}</p>
-                           <p><strong>Allergies:</strong> {wf.patientData.allergies}</p>
                         </div>
                   </div>
               )}
