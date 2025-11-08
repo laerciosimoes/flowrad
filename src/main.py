@@ -29,31 +29,53 @@ current_patient: Optional[Patient] = None
 
 
 # --- LangChain Tools ---
-
-def get_patient_info(age: int, sex: str, weight: float, indication: str,
-                     creatinine: Optional[float] = None, allergies_str: Optional[str] = None) -> str:
-    """Captures and stores patient information including age, sex, weight, clinical indication,
-    optional creatinine level, and optional allergies (comma-separated string).
+def get_patient_info(patient_info: str) -> str:
+    """Captures and stores patient information from a formatted string containing age, sex, weight, clinical indication,
+    optional creatinine level, and optional allergies.
+    Expected format: 'age: X, sex: Y, weight: Z, indication: ABC, creatinine: N, allergies: XYZ'
     Returns a confirmation string of the patient's data."""
-    allergies = [a.strip() for a in allergies_str.split(',')] if allergies_str else []
-    global current_patient
-    current_patient = Patient(age, sex, weight, indication, creatinine, allergies)
 
-    gfr = current_patient.calculate_gfr()
-    creatinine_info = (
-        f"Creatinine: {creatinine} mg/dL, GFR: {gfr:.1f}"
-        if creatinine is not None else "Creatinine: Not provided"
-    )
-    allergies_info = (
-        f"Allergies: {', '.join(allergies)}" if allergies else "No known allergies"
-    )
+    try:
+        # Parse the patient info string
+        info_parts = {}
+        for part in patient_info.split(','):
+            if ':' in part:
+                key, value = part.split(':', 1)
+                info_parts[key.strip().lower()] = value.strip()
+        
+        # Extract required fields
+        age = int(info_parts.get('age', 0))
+        sex = info_parts.get('sex', '').upper()
+        weight = float(info_parts.get('weight', 0))
+        indication = info_parts.get('indication', '')
+        
+        # Extract optional fields
+        creatinine_str = info_parts.get('creatinine', '')
+        creatinine = float(creatinine_str) if creatinine_str and creatinine_str.lower() != 'none' else None
+        
+        allergies_str = info_parts.get('allergies', '')
+        allergies = [a.strip() for a in allergies_str.split(',')] if allergies_str and allergies_str.lower() != 'none' else []
+        
+        global current_patient
+        current_patient = Patient(age, sex, weight, indication, creatinine, allergies)
 
-    return (
-        f"Patient data collected:\n"
-        f"Age: {age}, Sex: {sex}, Weight: {weight}kg\n"
-        f"Indication: {indication}\n{creatinine_info}\n{allergies_info}"
-    )
+        gfr = current_patient.calculate_gfr()
+        creatinine_info = (
+            f"Creatinine: {creatinine} mg/dL, GFR: {gfr:.1f}"
+            if creatinine is not None else "Creatinine: Not provided"
+        )
+        allergies_info = (
+            f"Allergies: {', '.join(allergies)}" if allergies else "No known allergies"
+        )
 
+        return (
+            f"Patient data collected:\n"
+            f"Age: {age}, Sex: {sex}, Weight: {weight}kg\n"
+            f"Indication: {indication}\n{creatinine_info}\n{allergies_info}"
+        )
+        
+    except Exception as e:
+        return f"Error parsing patient information: {str(e)}"
 
 def match_ct_protocol(indication: str) -> List[str]:
     """Matches a clinical indication to one or more potential CT protocols."""
@@ -119,7 +141,7 @@ def setup_ct_advisor_agent():
         Tool(
             name="GetPatientInfo",
             func=get_patient_info,
-            description="Registers patient data such as age, sex, weight, and indication.",
+            description="Registers patient data. Input should be a formatted string like: 'age: 25, sex: M, weight: 70, indication: chest pain, creatinine: 1.0, allergies: none'",
         ),
         Tool(
             name="MatchCTProtocol",
