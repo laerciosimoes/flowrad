@@ -27,6 +27,7 @@ const botQuestions: Record<ChatStep, string> = {
     done: "Your information has been submitted."
 };
 
+
 const LOCAL_STORAGE_KEY = 'flowrad-chat-session';
 
 export const PatientView: React.FC<PatientViewProps> = ({ examDetails, onComplete }) => {
