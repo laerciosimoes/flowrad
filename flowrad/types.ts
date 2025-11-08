@@ -13,9 +13,12 @@ export interface ExamDetails {
 
 export interface PatientData {
   examDetails: ExamDetails;
-  age: string;
+  age: number;
   sex: string;
-  allergies: string;
+  weight: number;
+  indication: string;
+  creatinine?: number;
+  allergies_str?: string;
   order: PatientFile | null;
   prescription: PatientFile | null;
   scans: PatientFile[];

@@ -21,9 +21,12 @@ const suggestProtocol = async (data: PatientData): Promise<string> => {
     // Fix: Consolidate instructions into systemInstruction and provide only data in the prompt.
     const prompt = `
         Patient Data:
-        - Age: ${data.age}
+        - Age: ${data.age} years
         - Sex: ${data.sex}
-        - Known Allergies: ${data.allergies}
+        - Weight: ${data.weight} kg
+        - Indication: ${data.indication}
+        - Creatinine: ${data.creatinine ? `${data.creatinine} mg/dL` : 'Unknown'}
+        - Allergies: ${data.allergies_str || 'None'}
     `;
     const response = await ai.models.generateContent({
         model: model,
@@ -38,9 +41,12 @@ const suggestDiagnosis = async (data: PatientData): Promise<string> => {
     // Fix: Remove redundant instructions from the text part as they are already in systemInstruction.
     const textPart = { text: `
         Patient Data:
-        - Age: ${data.age}
+        - Age: ${data.age} years
         - Sex: ${data.sex}
-        - Known Allergies: ${data.allergies}
+        - Weight: ${data.weight} kg
+        - Indication: ${data.indication}
+        - Creatinine: ${data.creatinine ? `${data.creatinine} mg/dL` : 'Unknown'}
+        - Allergies: ${data.allergies_str || 'None'}
     `};
     const imageParts: Part[] = [
         ...(data.order ? [{ inlineData: { mimeType: data.order.mimeType, data: data.order.base64 } }] : []),

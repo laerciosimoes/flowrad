@@ -10,15 +10,18 @@ interface PatientViewProps {
   onComplete: (data: PatientData) => void;
 }
 
-type ChatStep = 'age' | 'sex' | 'allergies' | 'order' | 'prescription' | 'scans' | 'confirm' | 'done';
+type ChatStep = 'age' | 'sex' | 'weight' | 'indication' | 'creatinine' | 'allergies' | 'order' | 'prescription' | 'scans' | 'confirm' | 'done';
 
-const steps: ChatStep[] = ['age', 'sex', 'allergies', 'order', 'prescription', 'scans', 'confirm'];
+const steps: ChatStep[] = ['age', 'sex', 'weight', 'indication', 'creatinine', 'allergies', 'order', 'prescription', 'scans', 'confirm'];
 const botQuestions: Record<ChatStep, string> = {
-    age: "To start, could you please provide your age?",
+    age: "To start, could you please provide your age (in years)?",
     sex: "Thank you. What is your sex?",
-    allergies: "And finally, do you have any known allergies? If none, please type 'None'.",
+    weight: "What is your weight (in kg)?",
+    indication: "What is the medical indication or reason for this exam?",
+    creatinine: "Do you know your creatinine level? If yes, please provide it (mg/dL). If you don't know, type 'unknown'.",
+    allergies: "Do you have any known allergies? If yes, please describe them. If none, type 'none'.",
     order: "Please upload a clear photo of your doctor's order.",
-    prescription: "If you have a prescription, please upload a photo of it. You can skip this step if you don't have one.",
+    prescription: "If you have a prescription, please upload it. You can skip this step if you don't have one.",
     scans: "Please upload any previous exam photos or scans you have. You can upload multiple files. Click 'Done Uploading' when you are finished.",
     confirm: "Thank you for providing all the information. Please review everything and click below to submit for AI analysis.",
     done: "Your information has been submitted."
@@ -61,7 +64,16 @@ export const PatientView: React.FC<PatientViewProps> = ({ examDetails, onComplet
     const [userInput, setUserInput] = useState('');
     const [isUploading, setIsUploading] = useState(false);
     const [patientData, setPatientData] = useState<PatientData>(initialSavedState?.patientData ?? {
-        examDetails, age: '', sex: '', allergies: '', order: null, prescription: null, scans: []
+        examDetails, 
+        age: 0, 
+        sex: '', 
+        weight: 0, 
+        indication: '', 
+        creatinine: undefined, 
+        allergies_str: undefined, 
+        order: null, 
+        prescription: null, 
+        scans: []
     });
     
     const chatEndRef = useRef<HTMLDivElement>(null);
@@ -101,9 +113,43 @@ export const PatientView: React.FC<PatientViewProps> = ({ examDetails, onComplet
         const currentStep = steps[currentStepIndex];
         const newData: Partial<PatientData> = {};
         
-        if(currentStep === 'age') newData.age = userInput;
+        if(currentStep === 'age') {
+            const age = Number.parseInt(userInput, 10);
+            if (Number.isNaN(age) || age <= 0) {
+                alert('Please enter a valid age (positive number)');
+                return;
+            }
+            newData.age = age;
+        }
         else if(currentStep === 'sex') newData.sex = userInput;
-        else if(currentStep === 'allergies') newData.allergies = userInput;
+        else if(currentStep === 'weight') {
+            const weight = Number.parseFloat(userInput);
+            if (Number.isNaN(weight) || weight <= 0) {
+                alert('Please enter a valid weight (positive number)');
+                return;
+            }
+            newData.weight = weight;
+        }
+        else if(currentStep === 'indication') newData.indication = userInput;
+        else if(currentStep === 'creatinine') {
+            if (userInput.toLowerCase() === 'unknown' || userInput.toLowerCase() === 'no') {
+                newData.creatinine = undefined;
+            } else {
+                const creatinine = Number.parseFloat(userInput);
+                if (Number.isNaN(creatinine) || creatinine <= 0) {
+                    alert('Please enter a valid creatinine level or "unknown"');
+                    return;
+                }
+                newData.creatinine = creatinine;
+            }
+        }
+        else if(currentStep === 'allergies') {
+            if (userInput.toLowerCase() === 'none' || userInput.toLowerCase() === 'no') {
+                newData.allergies_str = undefined;
+            } else {
+                newData.allergies_str = userInput;
+            }
+        }
         
         handleNextStep(newData, { sender: 'user', text: userInput });
         setUserInput('');
@@ -155,12 +201,19 @@ export const PatientView: React.FC<PatientViewProps> = ({ examDetails, onComplet
                 Processing...
             </div>
         ) : (
-            <input type="file" multiple={multiple} accept="image/*" onChange={onChange} disabled={isUploading} className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#0084d4] file:text-white hover:file:bg-[#0073b6] cursor-pointer"/>
+            <input 
+                type="file" 
+                multiple={multiple} 
+                accept="image/*,.pdf,.txt,.doc,.docx,text/*,application/pdf" 
+                onChange={onChange} 
+                disabled={isUploading} 
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#0084d4] file:text-white hover:file:bg-[#0073b6] cursor-pointer"
+            />
         )
     );
 
     const currentStep = steps[currentStepIndex];
-    const isTextStep = ['age', 'sex', 'allergies'].includes(currentStep);
+    const isTextStep = ['age', 'sex', 'weight', 'indication', 'creatinine', 'allergies'].includes(currentStep);
 
     return (
         <div className="w-full max-w-2xl h-[80vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200">
