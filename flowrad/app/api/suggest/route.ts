@@ -3,7 +3,8 @@ import { GoogleGenAI, Part } from "@google/genai";
 import { PatientData } from "@/types";
 import { NextResponse } from "next/server";
 
-const API_KEY = process.env.API_KEY;
+//const API_KEY = process.env.API_KEY;
+const API_KEY="AIzaSyCLpaLg6KRs4_U4MUFgdvZpOGgnUQp6iJk";
 
 if (!API_KEY) {
   console.error("API_KEY environment variable is not set");
